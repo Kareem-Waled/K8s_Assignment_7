@@ -1,0 +1,18 @@
+# node-monitor-ds.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-monitor
+spec:
+  selector:
+    matchLabels:
+      app: node-monitor
+  template:
+    metadata:
+      labels:
+        app: node-monitor
+    spec:
+      containers:
+      - name: monitor
+        image: nginx          # use nginx as a stand-in
+        command: ["sh", "-c", "while true; do echo monitoring; sleep 30; done"]

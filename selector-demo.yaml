@@ -1,0 +1,11 @@
+# selector-demo.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: selector-demo
+spec:
+  nodeSelector:
+    env: lab           # must match the label on the node
+  containers:
+  - name: nginx
+    image: nginx:latest

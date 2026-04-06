@@ -1,0 +1,24 @@
+# affinity-demo.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: affinity-demo
+spec:
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: disktype
+            operator: In
+            values: ["ssd"]
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 80
+        preference:
+          matchExpressions:
+          - key: zone
+            operator: In
+            values: ["us-east"]
+  containers:
+  - name: nginx
+    image: nginx:latest

@@ -1,0 +1,37 @@
+--- Task 1: nodeName Pod ---
+NAME            READY   STATUS    RESTARTS   AGE   IP             NODE       NOMINATED NODE   READINESS GATES
+static-pinned   1/1     Running   0          76s   10.244.1.123   minikube   <none>           <none>
+
+--- Task 2: NodeSelector & Pending Status ---
+NAME            READY   STATUS    RESTARTS   AGE   IP             NODE       NOMINATED NODE   READINESS GATES
+selector-demo   1/1     Running   0          77s   10.244.1.124   minikube   <none>           <none>
+NAME               READY   STATUS    RESTARTS   AGE
+pending-selector   0/1     Pending   0          30s
+
+--- Task 3: NoExecute Eviction Proof ---
+evict-me        0/1     Terminating   0          30s
+
+--- Task 5: QoS Classes Verification ---
+admin-8d879c85d-wgtpk	BestEffort
+affinity-demo	BestEffort
+api-69d864b4b8-gmhvs	BestEffort
+app-deployment-5d57cf5f97-drqgx	BestEffort
+besteffort-pod	BestEffort
+burstable-pod	Burstable
+demo-7fb87548c-dcxs9	BestEffort
+demo-7fb87548c-p5ngd	BestEffort
+frontend-rs-66f2h	BestEffort
+frontend-rs-8w2r6	BestEffort
+frontend-rs-9gkz8	BestEffort
+guaranteed-pod	Guaranteed
+pending-selector	BestEffort
+web-0	BestEffort
+web-1	BestEffort
+web-2	BestEffort
+webapp-77d5b49d9d-wzhcf	BestEffort
+webapp-configured-b589b8647-bjpf4	BestEffort
+webapp-configured-b589b8647-sxbrn	BestEffort
+webapp-configured-b589b8647-vdjs4	BestEffort
+
+--- Task 7: Static Pod Proof ---
+static-nginx-minikube   1/1     Running   0          1m    10.244.0.7   minikube
