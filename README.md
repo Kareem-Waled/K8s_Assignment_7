@@ -1,60 +1,144 @@
-Kubernetes Advanced Scheduling & Pod Management
-Configurations and execution logs covering nodeSelector, node affinity, taints & tolerations, QoS classes, DaemonSets, and Static Pods.
-☸ Kubernetes
-🐧 Linux
-⎈ Minikube
-Architecture & concepts
-01
-Direct pinning
-Force a pod onto a specific node using nodeName, bypassing the scheduler entirely.
-02
-Label-based scheduling
-nodeSelector and Node Affinity — both hard and soft rules — for flexible placement.
-03
-Taints & tolerations
-Control which pods land on which nodes using NoSchedule, PreferNoSchedule, and NoExecute.
-04
-Quality of service
-Guaranteed, Burstable, and BestEffort classes based on CPU/memory limits and requests.
-05
-Specialized pods
-DaemonSets (one pod per node) and Static Pods managed directly by the kubelet.
-Prerequisites
-A running Kubernetes cluster (e.g. minikube)
-kubectl
-installed and configured
-SSH access to cluster nodes (required for static pod creation)
-Tasks & execution log
-#	Feature	Description	Status
-1	nodeName	Hard-pinning a pod to the minikube node, bypassing the scheduler.	done
-2	nodeSelector	Scheduling based on env=lab label; observing Pending when label is absent.	done
-3	Taints & Tolerations	Testing NoSchedule (rejection) and NoExecute (eviction) effects.	done
-4	Node Affinity	Hard (requiredDuringScheduling) and soft (preferredDuringScheduling) rules by disk type and zone.	done
-5	QoS Classes	Three pods with varying resource configs triggering Guaranteed, Burstable, and BestEffort.	done
-6	DaemonSet	Deploying node-monitor — exactly one pod on every available node.	done
-7	Static Pods	Writing a manifest to /etc/kubernetes/manifests/ via minikube ssh for kubelet management.	done
-How to run
-1
-Start your local cluster
-minikube start
-2
-Apply the manifests
-kubectl apply -f <your-yaml-file>.yaml
-3
-Verify static pods (task 7)
-minikube ssh
-sudo tee /etc/kubernetes/manifests/static-nginx.yaml << 'EOF'
-apiVersion: v1
-kind: Pod
-metadata:
-  name: static-nginx
-spec:
-  containers:
-  - name: nginx
-    image: nginx:latest
-EOF
-exit
-4
-View consolidated proof of execution
-cat k8s_proof.txt
-Maintained by Kareem Waleed AbdulHameed — DevOps Engineer
+╔══════════════════════════════════════════════════════════════════════════════╗
+║             ☸  KUBERNETES — ADVANCED SCHEDULING & POD MANAGEMENT            ║
+║                            Assignment 7                                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Configurations and execution logs for Kubernetes advanced scheduling tasks.
+  Covers: nodeSelector · node affinity · taints · QoS classes · DaemonSets
+          · static pods
+
+  Stack: [ Kubernetes ]  [ Linux ]  [ Minikube ]
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  OVERVIEW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  This project focuses on advanced pod scheduling techniques, node management,
+  and how the Kubernetes scheduler handles resource allocation and constraints.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ARCHITECTURE & CONCEPTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  01 · DIRECT PINNING
+       Using `nodeName` to force a pod onto a specific node,
+       bypassing the default scheduler entirely.
+
+  02 · LABEL-BASED SCHEDULING
+       Utilizing `nodeSelector` and Node Affinity rules:
+         - Hard  →  requiredDuringSchedulingIgnoredDuringExecution
+         - Soft  →  preferredDuringSchedulingIgnoredDuringExecution
+
+  03 · TAINTS & TOLERATIONS
+       Controlling which pods land on which nodes:
+         - NoSchedule       →  new pods rejected
+         - PreferNoSchedule →  new pods avoid if possible
+         - NoExecute        →  existing pods evicted
+
+  04 · QUALITY OF SERVICE (QoS)
+       Pod classes based on CPU/memory requests & limits:
+         - Guaranteed   →  requests == limits (both set)
+         - Burstable    →  requests < limits
+         - BestEffort   →  no requests or limits set
+
+  05 · DAEMONSETS
+       Ensures exactly one pod runs on every available node.
+       Used here for: node-monitor deployment.
+
+  06 · STATIC PODS
+       Manifests written directly to /etc/kubernetes/manifests/
+       and managed by the kubelet — not the API server.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PREREQUISITES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ✦  A running Kubernetes cluster (e.g. minikube)
+  ✦  kubectl installed and configured
+  ✦  SSH access to cluster nodes (for static pod creation)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  TASKS & EXECUTION LOG
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ┌──────┬──────────────────────┬──────────────────────────────────────────┬────────┐
+  │  #   │  Feature             │  Description                             │ Status │
+  ├──────┼──────────────────────┼──────────────────────────────────────────┼────────┤
+  │  01  │  nodeName            │  Hard-pin pod to minikube node,          │  [OK]  │
+  │      │                      │  bypassing the scheduler.                │        │
+  ├──────┼──────────────────────┼──────────────────────────────────────────┼────────┤
+  │  02  │  nodeSelector        │  Schedule pods via env=lab label.        │  [OK]  │
+  │      │                      │  Observe Pending when label is absent.   │        │
+  ├──────┼──────────────────────┼──────────────────────────────────────────┼────────┤
+  │  03  │  Taints &            │  Test NoSchedule (rejection) and         │  [OK]  │
+  │      │  Tolerations         │  NoExecute (eviction) effects.           │        │
+  ├──────┼──────────────────────┼──────────────────────────────────────────┼────────┤
+  │  04  │  Node Affinity       │  Hard + Soft rules based on disk types   │  [OK]  │
+  │      │                      │  and availability zones.                 │        │
+  ├──────┼──────────────────────┼──────────────────────────────────────────┼────────┤
+  │  05  │  QoS Classes         │  3 pods with varying requests/limits     │  [OK]  │
+  │      │                      │  → Guaranteed, Burstable, BestEffort.    │        │
+  ├──────┼──────────────────────┼──────────────────────────────────────────┼────────┤
+  │  06  │  DaemonSet           │  Deploy node-monitor — one pod per node. │  [OK]  │
+  ├──────┼──────────────────────┼──────────────────────────────────────────┼────────┤
+  │  07  │  Static Pods         │  Write manifest to manifests dir via     │  [OK]  │
+  │      │                      │  minikube ssh for kubelet management.    │        │
+  └──────┴──────────────────────┴──────────────────────────────────────────┴────────┘
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  HOW TO RUN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. Start your local cluster:
+     ─────────────────────────
+     minikube start
+
+
+  2. Apply the manifests:
+     ─────────────────────
+     kubectl apply -f <your-yaml-file>.yaml
+
+
+  3. Verify Static Pods (Task 07):
+     ───────────────────────────────
+     minikube ssh
+
+     sudo tee /etc/kubernetes/manifests/static-nginx.yaml << 'EOF'
+     apiVersion: v1
+     kind: Pod
+     metadata:
+       name: static-nginx
+     spec:
+       containers:
+       - name: nginx
+         image: nginx:latest
+     EOF
+
+     exit
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  DELIVERABLES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  All required command outputs have been piped into k8s_proof.txt.
+  To view the consolidated proof of execution:
+
+     cat k8s_proof.txt
+
+  The completed k8s_proof.txt is located in the root of this repository.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  MAINTAINED BY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Kareem Waleed AbdulHameed
+  DevOps Engineer
+
+══════════════════════════════════════════════════════════════════════════════
